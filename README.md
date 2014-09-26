@@ -19,8 +19,8 @@ request('http://www.example.com', { maxRedirects: 10 })
 ```
 
 
-[travis-url]: http://travis-ci.org/Janpot/kwest-text
-[travis-image]: http://img.shields.io/travis/Janpot/kwest-text.svg?style=flat
+[travis-url]: http://travis-ci.org/Janpot/kwest-redirect
+[travis-image]: http://img.shields.io/travis/Janpot/kwest-redirect.svg?style=flat
 
-[depstat-url]: https://david-dm.org/Janpot/kwest-text
-[depstat-image]: http://img.shields.io/david/Janpot/kwest-text.svg?style=flat
+[depstat-url]: https://david-dm.org/Janpot/kwest-redirect
+[depstat-image]: http://img.shields.io/david/Janpot/kwest-redirect.svg?style=flat
