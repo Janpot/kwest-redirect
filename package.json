@@ -1,0 +1,28 @@
+{
+  "name": "kwest-redirect",
+  "version": "0.0.1",
+  "description": "Redirect kwest requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "kwest",
+    "gzip"
+  ],
+  "author": "Jan Potoms",
+  "license": "MIT",
+  "dependencies": {
+    "fast-url-parser": "^1.0.6-0"
+  },
+  "devDependencies": {
+    "bluebird": "^2.3.2",
+    "chai": "^1.9.1",
+    "kwest": "0.0.2",
+    "mocha": "^1.21.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Janpot/kwest-redirect.git"
+  }
+}
