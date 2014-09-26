@@ -1,4 +1,4 @@
-# kwest-text [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
+# kwest-redirect [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
 
 Redirect requests for [kwest](https://github.com/Janpot/kwest) module.
 
