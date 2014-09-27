@@ -1,6 +1,7 @@
 var kwestRedirect = require('..'),
     Promise   = require('bluebird'),
     kwest     = require('kwest-base'),
+    caseless  = require('caseless'),
     assert    = require('chai').assert;
 
 describe('kwest-redirect', function () {
@@ -26,7 +27,8 @@ describe('kwest-redirect', function () {
 
     var kwestMock = kwest.wrap(function (request, next) {
       return Promise.resolve({
-        statusCode: 301
+        statusCode: 301,
+        headers: caseless({})
       });
     });
 
@@ -51,9 +53,9 @@ describe('kwest-redirect', function () {
         hasRedirected = true;
         return Promise.resolve({
           statusCode: 301,
-          headers: {
+          headers: caseless({
             location: 'relative'
-          }
+          })
         });
       } else if (request.uri.href === 'http://www.example.com/relative') {
         return Promise.resolve({
@@ -85,9 +87,9 @@ describe('kwest-redirect', function () {
         hasRedirected = true;
         return Promise.resolve({
           statusCode: 301,
-          headers: {
+          headers: caseless({
             location: 'http://www.example2.com/'
-          }
+          })
         });
       } else if (request.uri.href === 'http://www.example2.com/') {
         return Promise.resolve({
@@ -119,9 +121,9 @@ describe('kwest-redirect', function () {
       requestCount += 1;
       return Promise.resolve({
         statusCode: 301,
-        headers: {
+        headers: caseless({
           location: 'http://www.example.com'
-        }
+        })
       });
     });
 
