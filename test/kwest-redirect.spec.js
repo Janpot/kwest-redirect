@@ -6,10 +6,16 @@ var kwestRedirect = require('..'),
 
 describe('kwest-redirect', function () {
 
+  function mockResponse(response) {
+    response.headers = response.headers || {};
+    caseless.httpify(response, response.headers);
+    return Promise.resolve(response);
+  }
+
   it('shouldn\'t redirect on good status', function (done) {
 
     var kwestMock = kwest.wrap(function (request, next) {
-      return Promise.resolve({
+      return mockResponse({
         statusCode: 200
       });
     });
@@ -26,9 +32,8 @@ describe('kwest-redirect', function () {
   it('should error on missing location', function (done) {
 
     var kwestMock = kwest.wrap(function (request, next) {
-      return Promise.resolve({
-        statusCode: 301,
-        headers: caseless({})
+      return mockResponse({
+        statusCode: 301
       });
     });
 
@@ -51,14 +56,14 @@ describe('kwest-redirect', function () {
     var kwestMock = kwest.wrap(function (request, next) {
       if (request.uri.href === 'http://www.example.com/') {
         hasRedirected = true;
-        return Promise.resolve({
-          statusCode: 301,
-          headers: caseless({
+        return mockResponse({
+          statusCode: 301, 
+          headers: {
             location: 'relative'
-          })
+          }
         });
       } else if (request.uri.href === 'http://www.example.com/relative') {
-        return Promise.resolve({
+        return mockResponse({
           statusCode: 200,
           body: 'hello'
         });
@@ -85,14 +90,14 @@ describe('kwest-redirect', function () {
     var kwestMock = kwest.wrap(function (request, next) {
       if (request.uri.href === 'http://www.example.com/') {
         hasRedirected = true;
-        return Promise.resolve({
+        return mockResponse({
           statusCode: 301,
-          headers: caseless({
+          headers: {
             location: 'http://www.example2.com/'
-          })
+          }
         });
       } else if (request.uri.href === 'http://www.example2.com/') {
-        return Promise.resolve({
+        return mockResponse({
           statusCode: 200,
           body: 'hello'
         });
@@ -119,11 +124,11 @@ describe('kwest-redirect', function () {
     var kwestMock = kwest.wrap(function (request, next) {
       // redirect loop
       requestCount += 1;
-      return Promise.resolve({
+      return mockResponse({
         statusCode: 301,
-        headers: caseless({
-          location: 'http://www.example.com'
-        })
+        headers: {
+          location: 'http://www.example.com/' + requestCount
+        }
       });
     });
 

@@ -49,7 +49,7 @@ function kwestRedirect(options) {
       }
 
       if (isRedirect(request, response)) {
-        var location = response.headers.get('location');
+        var location = response.getHeader('location');
 
         if (!location) {
           throw new RedirectError(util.format(
