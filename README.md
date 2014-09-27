@@ -1,6 +1,6 @@
 # kwest-redirect [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
 
-Redirect requests for [kwest](https://github.com/Janpot/kwest) module.
+Redirect middleware for [kwest](https://github.com/Janpot/kwest) module.
 
 ## Installation
 
@@ -10,9 +10,10 @@ Redirect requests for [kwest](https://github.com/Janpot/kwest) module.
 
 ```js
 var redirect = require('kwest-redirect'),
-    request  = redirect(require('kwest'));
+    base     = require('kwest-base'),
+    request  = base.wrap(redirect({ maxRedirects: 10 }));
 
-request('http://www.example.com', { maxRedirects: 10 })
+request('http://www.example.com')
   .then(function (res) {
     // has followed all redirects
   });
