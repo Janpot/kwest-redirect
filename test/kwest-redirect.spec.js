@@ -14,13 +14,12 @@ describe('kwest-redirect', function () {
 
   it('shouldn\'t redirect on good status', function (done) {
 
-    var kwestMock = kwest.wrap(function (request, next) {
+    var redirectKwest = kwest(function (request) {
       return mockResponse({
         statusCode: 200
       });
-    });
+    }).use(kwestRedirect());
 
-    var redirectKwest = kwestMock.wrap(kwestRedirect());
     redirectKwest('http://www.example.com')
       .then(function (res) {
         done();
@@ -31,13 +30,12 @@ describe('kwest-redirect', function () {
 
   it('should error on missing location', function (done) {
 
-    var kwestMock = kwest.wrap(function (request, next) {
+    var redirectKwest = kwest(function (request) {
       return mockResponse({
         statusCode: 301
       });
-    });
+    }).use(kwestRedirect());
 
-    var redirectKwest = kwestMock.wrap(kwestRedirect());
     redirectKwest('http://www.example.com')
       .then(function (res) {
         done(new Error('error expected'));
@@ -53,7 +51,7 @@ describe('kwest-redirect', function () {
 
     var hasRedirected = false;
 
-    var kwestMock = kwest.wrap(function (request, next) {
+    var redirectKwest = kwest(function (request) {
       if (request.uri.href === 'http://www.example.com/') {
         hasRedirected = true;
         return mockResponse({
@@ -70,9 +68,8 @@ describe('kwest-redirect', function () {
       }
 
       throw new Error('Unrecognized url ' + request.uri.href);
-    });
+    }).use(kwestRedirect());
 
-    var redirectKwest = kwestMock.wrap(kwestRedirect());
     redirectKwest('http://www.example.com')
       .then(function (res) {
         assert.ok(hasRedirected, 'should have redirected');
@@ -87,7 +84,7 @@ describe('kwest-redirect', function () {
 
     var hasRedirected = false;
 
-    var kwestMock = kwest.wrap(function (request, next) {
+    var redirectKwest = kwest(function (request) {
       if (request.uri.href === 'http://www.example.com/') {
         hasRedirected = true;
         return mockResponse({
@@ -104,9 +101,8 @@ describe('kwest-redirect', function () {
       }
 
       throw new Error('Unrecognized url ' + request.uri.href);
-    });
+    }).use(kwestRedirect());
 
-    var redirectKwest = kwestMock.wrap(kwestRedirect());
     redirectKwest('http://www.example.com')
       .then(function (res) {
         assert.ok(hasRedirected, 'should have redirected');
@@ -121,7 +117,7 @@ describe('kwest-redirect', function () {
 
     var requestCount = 0;
 
-    var kwestMock = kwest.wrap(function (request, next) {
+    var redirectKwest = kwest(function (request) {
       // redirect loop
       requestCount += 1;
       return mockResponse({
@@ -130,11 +126,8 @@ describe('kwest-redirect', function () {
           location: 'http://www.example.com/' + requestCount
         }
       });
-    });
+    }).use(kwestRedirect({ maxRedirects: 5 }));
 
-    var redirectKwest = kwestMock.wrap(kwestRedirect({
-      maxRedirects: 5
-    }));
     redirectKwest('http://www.example.com')
       .then(function (res) {
         done(new Error('Redirect loop expected'));

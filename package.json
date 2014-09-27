@@ -19,7 +19,7 @@
     "bluebird": "^2.3.2",
     "caseless": "^0.6.0",
     "chai": "^1.9.1",
-    "kwest-base": "0.0.1",
+    "kwest-base": "0.1.0",
     "mocha": "^1.21.4"
   },
   "repository": {
