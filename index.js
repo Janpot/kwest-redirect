@@ -14,7 +14,7 @@ RedirectError.prototype.constructor = RedirectError;
 
 
 
-function kwestRedirect(kwest, options) {
+function kwestRedirect(options) {
   options = options || {};
   options.maxRedirects = options.maxRedirects || DEFAULT_MAX_REDIRECTS;
 
@@ -37,7 +37,7 @@ function kwestRedirect(kwest, options) {
     return 300 <= response.statusCode && response.statusCode < 400;
   }
 
-  return kwest.wrap(function (makeRequest, request) {
+  return function (request, next) {
     var redirectsFollowed = 0;
 
     function followRedirects(response) {
@@ -61,14 +61,14 @@ function kwestRedirect(kwest, options) {
         var redirectUrl = urlUtil.resolve(request.uri.href, location);        
         request.uri = urlUtil.parse(redirectUrl);
         redirectsFollowed += 1;
-        return makeRequest(request).then(followRedirects);
+        return next(request).then(followRedirects);
       }
 
       return response;
     }
 
-    return makeRequest(request).then(followRedirects);
-  });
+    return next(request).then(followRedirects);
+  };
 }
 
 kwestRedirect.RedirectError = RedirectError;
