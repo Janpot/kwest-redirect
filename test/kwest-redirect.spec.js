@@ -140,9 +140,9 @@ describe('kwest-redirect', function () {
           location: 'http://www.example.com/landing'
         }
       });
-    }).use(kwestRedirect({ followRedirects: true }));
+    }).use(kwestRedirect({ followRedirect: true }));
 
-    redirectKwest({ uri: 'http://www.example.com', followRedirects: false })
+    redirectKwest({ uri: 'http://www.example.com', followRedirect: false })
       .then(function (res) {
         assert.strictEqual(res.statusCode, 301);
         assert.strictEqual(

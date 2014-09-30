@@ -19,7 +19,7 @@ function kwestRedirect(globalOptions) {
   globalOptions = globalOptions || {};
   defaults(globalOptions, {
     maxRedirects: DEFAULT_MAX_REDIRECTS,
-    followRedirects: true
+    followRedirect: true
   });
 
 
@@ -27,10 +27,10 @@ function kwestRedirect(globalOptions) {
     var redirectsFollowed = 0;
     var options = defaults({
       maxRedirects: request.maxRedirects,
-      followRedirects: request.followRedirects
+      followRedirect: request.followRedirect
     }, globalOptions);
 
-    if (request.followRedirects === false) {
+    if (request.followRedirect === false) {
       return next(request);
     }
 
