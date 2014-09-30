@@ -15,12 +15,12 @@ RedirectError.prototype.constructor = RedirectError;
 
 
 function isRedirect(options, request, response) {
-  if (request.followRedirect === false) {
+  if (options.followRedirect === false) {
     return false;
   }
 
-  if (typeof(request.followRedirect) === 'function') {
-    return request.followRedirect(response);
+  if (typeof(options.followRedirect) === 'function') {
+    return options.followRedirect(response);
   }
 
   if (!options.followAll) {
