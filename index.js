@@ -1,7 +1,8 @@
 'use strict';
 
-var util    = require('util'),
-    urlUtil = require('fast-url-parser');
+var util     = require('util'),
+    defaults = require('merge-defaults'),
+    urlUtil  = require('fast-url-parser');
 
 var DEFAULT_MAX_REDIRECTS = 10;
 
@@ -14,31 +15,43 @@ RedirectError.prototype.constructor = RedirectError;
 
 
 
-function kwestRedirect(options) {
-  options = options || {};
-  options.maxRedirects = options.maxRedirects || DEFAULT_MAX_REDIRECTS;
+function kwestRedirect(globalOptions) {
+  globalOptions = globalOptions || {};
+  defaults(globalOptions, {
+    maxRedirects: DEFAULT_MAX_REDIRECTS,
+    followRedirects: true
+  });
 
-  function isRedirect(request, response) {
-    if (!options.followAll) {
-      var method = request.method && request.method.toUpperCase();
-
-      var isAllowedMethod = [
-        'PATCH',
-        'PUT',
-        'POST',
-        'DELETE'
-      ].indexOf(method) < 0;
-
-      if (!isAllowedMethod) {
-        return false;
-      }
-    }
-
-    return 300 <= response.statusCode && response.statusCode < 400;
-  }
 
   return function (request, next) {
     var redirectsFollowed = 0;
+    var options = defaults({
+      maxRedirects: request.maxRedirects,
+      followRedirects: request.followRedirects
+    }, globalOptions);
+
+    if (request.followRedirects === false) {
+      return next(request);
+    }
+
+    function isRedirect(request, response) {
+      if (!options.followAll) {
+        var method = request.method && request.method.toUpperCase();
+
+        var isAllowedMethod = [
+          'PATCH',
+          'PUT',
+          'POST',
+          'DELETE'
+        ].indexOf(method) < 0;
+
+        if (!isAllowedMethod) {
+          return false;
+        }
+      }
+
+      return 300 <= response.statusCode && response.statusCode < 400;
+    }
 
     function followRedirects(response) {
       if (redirectsFollowed >= options.maxRedirects) {

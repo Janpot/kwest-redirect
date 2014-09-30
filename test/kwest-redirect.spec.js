@@ -1,21 +1,13 @@
-var kwestRedirect = require('..'),
-    Promise   = require('bluebird'),
-    kwest     = require('kwest-base'),
-    caseless  = require('caseless'),
+var kwestRedirect = require('../index'),
+    mock      = require('kwest-mock'),
     assert    = require('chai').assert;
 
 describe('kwest-redirect', function () {
 
-  function mockResponse(response) {
-    response.headers = response.headers || {};
-    caseless.httpify(response, response.headers);
-    return Promise.resolve(response);
-  }
-
   it('shouldn\'t redirect on good status', function (done) {
 
-    var redirectKwest = kwest(function (request) {
-      return mockResponse({
+    var redirectKwest = mock(function (request, respond) {
+      return respond({
         statusCode: 200
       });
     }).use(kwestRedirect());
@@ -30,8 +22,8 @@ describe('kwest-redirect', function () {
 
   it('should error on missing location', function (done) {
 
-    var redirectKwest = kwest(function (request) {
-      return mockResponse({
+    var redirectKwest = mock(function (request, respond) {
+      return respond({
         statusCode: 301
       });
     }).use(kwestRedirect());
@@ -51,17 +43,17 @@ describe('kwest-redirect', function () {
 
     var hasRedirected = false;
 
-    var redirectKwest = kwest(function (request) {
+    var redirectKwest = mock(function (request, respond) {
       if (request.uri.href === 'http://www.example.com/') {
         hasRedirected = true;
-        return mockResponse({
+        return respond({
           statusCode: 301, 
           headers: {
             location: 'relative'
           }
         });
       } else if (request.uri.href === 'http://www.example.com/relative') {
-        return mockResponse({
+        return respond({
           statusCode: 200,
           body: 'hello'
         });
@@ -84,17 +76,17 @@ describe('kwest-redirect', function () {
 
     var hasRedirected = false;
 
-    var redirectKwest = kwest(function (request) {
+    var redirectKwest = mock(function (request, respond) {
       if (request.uri.href === 'http://www.example.com/') {
         hasRedirected = true;
-        return mockResponse({
+        return respond({
           statusCode: 301,
           headers: {
             location: 'http://www.example2.com/'
           }
         });
       } else if (request.uri.href === 'http://www.example2.com/') {
-        return mockResponse({
+        return respond({
           statusCode: 200,
           body: 'hello'
         });
@@ -117,10 +109,10 @@ describe('kwest-redirect', function () {
 
     var requestCount = 0;
 
-    var redirectKwest = kwest(function (request) {
+    var redirectKwest = mock(function (request, respond) {
       // redirect loop
       requestCount += 1;
-      return mockResponse({
+      return respond({
         statusCode: 301,
         headers: {
           location: 'http://www.example.com/' + requestCount
@@ -134,6 +126,28 @@ describe('kwest-redirect', function () {
       })
       .catch(kwestRedirect.RedirectError, function () {
         assert.strictEqual(requestCount, 6);
+        done();
+      })
+      .catch(done);
+
+  });
+
+  it('options should override global', function (done) {
+    var redirectKwest = mock(function (request, respond) {
+      return respond({
+        statusCode: 301,
+        headers: {
+          location: 'http://www.example.com/landing'
+        }
+      });
+    }).use(kwestRedirect({ followRedirects: true }));
+
+    redirectKwest({ uri: 'http://www.example.com', followRedirects: false })
+      .then(function (res) {
+        assert.strictEqual(res.statusCode, 301);
+        assert.strictEqual(
+          res.getHeader('location'), 'http://www.example.com/landing'
+        );
         done();
       })
       .catch(done);
