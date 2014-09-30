@@ -154,4 +154,37 @@ describe('kwest-redirect', function () {
 
   });
 
+  it('options should accept a filter', function (done) {
+    function filter(response) {
+      if (response.getHeader('location') === 'http://www.example.com/2') {
+        return false;
+      }
+      return true;
+    }
+
+    var count = 0;
+
+    var redirectKwest = mock(function (request, respond) {
+      count += 1;
+      return respond({
+        statusCode: 301,
+        headers: {
+          location: 'http://www.example.com/' + count
+        }
+      });
+    }).use(kwestRedirect({ followRedirect: true }));
+
+    redirectKwest({ uri: 'http://www.example.com', followRedirect: filter })
+      .then(function (res) {
+        assert.strictEqual(res.statusCode, 301);
+        assert.strictEqual(
+          res.getHeader('location'), 'http://www.example.com/2'
+        );
+        assert.strictEqual(count, 2);
+        done();
+      })
+      .catch(done);
+
+  });
+
 });

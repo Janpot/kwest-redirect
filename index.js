@@ -14,6 +14,32 @@ RedirectError.prototype = new Error();
 RedirectError.prototype.constructor = RedirectError;
 
 
+function isRedirect(options, request, response) {
+  if (request.followRedirect === false) {
+    return false;
+  }
+
+  if (typeof(request.followRedirect) === 'function') {
+    return request.followRedirect(response);
+  }
+
+  if (!options.followAll) {
+    var method = request.method && request.method.toUpperCase();
+
+    var isAllowedMethod = [
+      'PATCH',
+      'PUT',
+      'POST',
+      'DELETE'
+    ].indexOf(method) < 0;
+
+    if (!isAllowedMethod) {
+      return false;
+    }
+  }
+
+  return 300 <= response.statusCode && response.statusCode < 400;
+}
 
 function kwestRedirect(globalOptions) {
   globalOptions = globalOptions || {};
@@ -30,28 +56,7 @@ function kwestRedirect(globalOptions) {
       followRedirect: request.followRedirect
     }, globalOptions);
 
-    if (request.followRedirect === false) {
-      return next(request);
-    }
-
-    function isRedirect(request, response) {
-      if (!options.followAll) {
-        var method = request.method && request.method.toUpperCase();
-
-        var isAllowedMethod = [
-          'PATCH',
-          'PUT',
-          'POST',
-          'DELETE'
-        ].indexOf(method) < 0;
-
-        if (!isAllowedMethod) {
-          return false;
-        }
-      }
-
-      return 300 <= response.statusCode && response.statusCode < 400;
-    }
+    
 
     function followRedirects(response) {
       if (redirectsFollowed >= options.maxRedirects) {
@@ -61,7 +66,7 @@ function kwestRedirect(globalOptions) {
         ));
       }
 
-      if (isRedirect(request, response)) {
+      if (isRedirect(options, request, response)) {
         var location = response.getHeader('location');
 
         if (!location) {
