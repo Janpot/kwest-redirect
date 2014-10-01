@@ -4,6 +4,7 @@ var util     = require('util'),
     defaults = require('merge-defaults'),
     urlUtil  = require('fast-url-parser');
 
+
 var DEFAULT_MAX_REDIRECTS = 10;
 
 function RedirectError(message) {
@@ -41,22 +42,22 @@ function isRedirect(options, request, response) {
   return 300 <= response.statusCode && response.statusCode < 400;
 }
 
+
 function kwestRedirect(globalOptions) {
-  globalOptions = globalOptions || {};
-  defaults(globalOptions, {
-    maxRedirects: DEFAULT_MAX_REDIRECTS,
-    followRedirect: true
+  globalOptions = defaults(globalOptions || {}, {
+    maxRedirects  : DEFAULT_MAX_REDIRECTS,
+    followRedirect: true,
+    followAll     : false
   });
 
 
   return function (request, next) {
     var redirectsFollowed = 0;
     var options = defaults({
-      maxRedirects: request.maxRedirects,
-      followRedirect: request.followRedirect
+      maxRedirects  : request.maxRedirects,
+      followRedirect: request.followRedirect,
+      followAll     : request.followAll
     }, globalOptions);
-
-    
 
     function followRedirects(response) {
       if (redirectsFollowed >= options.maxRedirects) {
@@ -67,6 +68,7 @@ function kwestRedirect(globalOptions) {
       }
 
       if (isRedirect(options, request, response)) {
+        response.data.end();
         var location = response.getHeader('location');
 
         if (!location) {
