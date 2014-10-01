@@ -68,7 +68,7 @@ function kwestRedirect(globalOptions) {
       }
 
       if (isRedirect(options, request, response)) {
-        response.data.end();
+        response.data.resume();
         var location = response.getHeader('location');
 
         if (!location) {
