@@ -1,6 +1,6 @@
 {
   "name": "kwest-redirect",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Redirect kwest requests",
   "main": "index.js",
   "scripts": {
