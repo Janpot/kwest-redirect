@@ -42,9 +42,9 @@ describe('kwest-redirect', function () {
   it('should redirect relative', function (done) {
 
     var hasRedirected = false;
-
     var redirectKwest = mock(function (request, respond) {
-      if (request.uri.href === 'http://www.example.com/') {
+      //console.log(request.getUrl());
+      if (request.getUrl() === 'http://www.example.com/') {
         hasRedirected = true;
         return respond({
           statusCode: 301, 
@@ -52,14 +52,14 @@ describe('kwest-redirect', function () {
             location: 'relative'
           }
         });
-      } else if (request.uri.href === 'http://www.example.com/relative') {
+      } else if (request.getUrl() === 'http://www.example.com/relative') {
         return respond({
           statusCode: 200,
           body: 'hello'
         });
       }
 
-      throw new Error('Unrecognized url ' + request.uri.href);
+      throw new Error('Unrecognized url ' + request.getUrl());
     }).use(kwestRedirect());
 
     redirectKwest('http://www.example.com')
@@ -77,7 +77,7 @@ describe('kwest-redirect', function () {
     var hasRedirected = false;
 
     var redirectKwest = mock(function (request, respond) {
-      if (request.uri.href === 'http://www.example.com/') {
+      if (request.getUrl() === 'http://www.example.com/') {
         hasRedirected = true;
         return respond({
           statusCode: 301,
@@ -85,14 +85,14 @@ describe('kwest-redirect', function () {
             location: 'http://www.example2.com/'
           }
         });
-      } else if (request.uri.href === 'http://www.example2.com/') {
+      } else if (request.getUrl() === 'http://www.example2.com/') {
         return respond({
           statusCode: 200,
           body: 'hello'
         });
       }
 
-      throw new Error('Unrecognized url ' + request.uri.href);
+      throw new Error('Unrecognized url ' + request.getUrl());
     }).use(kwestRedirect());
 
     redirectKwest('http://www.example.com')

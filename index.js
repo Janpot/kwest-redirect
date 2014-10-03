@@ -63,7 +63,7 @@ function kwestRedirect(globalOptions) {
       if (redirectsFollowed >= options.maxRedirects) {
         throw new RedirectError(util.format(
           'Exceeded maxRedirects. Probably stuck in a redirect loop: %s',
-          request.uri.href
+          request.getUrl()
         ));
       }
 
@@ -74,12 +74,12 @@ function kwestRedirect(globalOptions) {
         if (!location) {
           throw new RedirectError(util.format(
             'Redirected without location header: %s',
-            request.uri.href
+            request.getUrl()
           ));
         }
 
-        var redirectUrl = urlUtil.resolve(request.uri.href, location);        
-        request.uri = urlUtil.parse(redirectUrl);
+        var redirectUrl = urlUtil.resolve(request.getUrl(), location);  
+        request.setUrl(redirectUrl);
         redirectsFollowed += 1;
         return next(request).then(followRedirects);
       }
